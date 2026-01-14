@@ -23,10 +23,6 @@ class AhrefsService {
     return this.apiKey;
   }
 
-  private normalizeCountry(country: string | undefined): string {
-    return country ? country.toLowerCase() : '';
-  }
-
   private async request<T>(endpoint: string, params: Record<string, string>): Promise<T> {
     if (!this.apiKey) {
       throw new Error('API key not set');
