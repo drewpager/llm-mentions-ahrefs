@@ -28,17 +28,21 @@ class AhrefsService {
       throw new Error('API key not set');
     }
 
-    const url = new URL(`${API_BASE}${endpoint}`);
+    const urlPath = `${API_BASE}${endpoint}`;
+    const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
       // Normalize country codes to lowercase
       if (key === 'country' && value) {
-        url.searchParams.append(key, value.toLowerCase());
+        searchParams.append(key, value.toLowerCase());
       } else if (value) {
-        url.searchParams.append(key, value);
+        searchParams.append(key, value);
       }
     });
 
-    const response = await fetch(url.toString(), {
+    const queryString = searchParams.toString();
+    const fullUrl = queryString ? `${urlPath}?${queryString}` : urlPath;
+
+    const response = await fetch(fullUrl, {
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
         Accept: 'application/json',
