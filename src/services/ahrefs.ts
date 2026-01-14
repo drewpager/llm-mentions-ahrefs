@@ -50,8 +50,17 @@ class AhrefsService {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
-      throw new Error(error.error || `API Error: ${response.status}`);
+      const errorData = await response.json().catch(() => ({ error: response.statusText }));
+      // Handle various error response formats from Ahrefs API
+      let errorMessage = `API Error: ${response.status}`;
+      if (typeof errorData.error === 'string') {
+        errorMessage = errorData.error;
+      } else if (errorData.error?.message) {
+        errorMessage = errorData.error.message;
+      } else if (errorData.message) {
+        errorMessage = errorData.message;
+      }
+      throw new Error(errorMessage);
     }
 
     return response.json();
