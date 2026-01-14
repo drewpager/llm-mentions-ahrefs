@@ -6,7 +6,14 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+# Environment
 .env
+.env.local
+
+# Test artifacts
+test-*.png
+screenshot-*.png
 
 node_modules
 dist
