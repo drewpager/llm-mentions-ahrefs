@@ -9,8 +9,8 @@ import type {
   AIResponse,
 } from '../types';
 
-// Use local proxy to avoid CORS issues
-const API_BASE = 'http://localhost:3001/api';
+// Use local proxy in dev, Vercel serverless in production
+const API_BASE = import.meta.env.PROD ? '/api' : 'http://localhost:3001/api';
 
 class AhrefsService {
   private apiKey: string = '';
@@ -23,6 +23,10 @@ class AhrefsService {
     return this.apiKey;
   }
 
+  private normalizeCountry(country: string | undefined): string {
+    return country ? country.toLowerCase() : '';
+  }
+
   private async request<T>(endpoint: string, params: Record<string, string>): Promise<T> {
     if (!this.apiKey) {
       throw new Error('API key not set');
@@ -30,7 +34,12 @@ class AhrefsService {
 
     const url = new URL(`${API_BASE}${endpoint}`);
     Object.entries(params).forEach(([key, value]) => {
-      if (value) url.searchParams.append(key, value);
+      // Normalize country codes to lowercase
+      if (key === 'country' && value) {
+        url.searchParams.append(key, value.toLowerCase());
+      } else if (value) {
+        url.searchParams.append(key, value);
+      }
     });
 
     const response = await fetch(url.toString(), {
